@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>こころのチェック ― 災害のあとの心を support するツール</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&family=Noto+Sans+JP:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #EEF1EA;
+    --surface: #FBFBF7;
+    --ink: #24312A;
+    --ink-soft: #55645C;
+    --pine: #35564C;
+    --pine-deep: #223B33;
+    --gold: #C98A3E;
+    --gold-soft: #E9CFA0;
+    --dusk: #4B5A78;
+    --dusk-deep: #34415C;
+    --brick: #A85847;
+    --line: #DAD9CC;
+    --radius: 18px;
+    --shadow: 0 6px 24px rgba(34,59,51,0.08);
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:"Noto Sans JP",sans-serif;
+    line-height:1.8;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3,.display{
+    font-family:"Zen Maru Gothic",sans-serif;
+  }
+  .app{max-width:720px;margin:0 auto;padding:0 0 80px;}
+  a{color:inherit;}
+
+  /* ---------- HERO ---------- */
+  .hero{
+    position:relative;
+    padding:56px 24px 64px;
+    background:linear-gradient(165deg, var(--pine-deep) 0%, var(--pine) 55%, #8F7A4E 100%);
+    color:#F6F3E8;
+    border-radius:0 0 32px 32px;
+    overflow:hidden;
+    text-align:center;
+  }
+  .hero::after{
+    content:"";
+    position:absolute; inset:0;
+    background:radial-gradient(circle at 50% 120%, rgba(201,138,62,0.35), transparent 60%);
+    pointer-events:none;
+  }
+  .eyebrow{
+    font-size:13px;
+    letter-spacing:.14em;
+    color:var(--gold-soft);
+    font-weight:600;
+    margin-bottom:14px;
+  }
+  .hero h1{
+    font-size:clamp(28px,7vw,38px);
+    margin:0 0 14px;
+    font-weight:900;
+    letter-spacing:.02em;
+  }
+  .hero p{
+    font-size:15px;
+    color:#E7E5D6;
+    max-width:46ch;
+    margin:0 auto 34px;
+  }
+
+  /* breathing circle (signature element) */
+  .breath-wrap{
+    position:relative;
+    width:180px;height:180px;
+    margin:0 auto 30px;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .breath-ring{
+    position:absolute;inset:0;
+    border-radius:50%;
+    border:1px solid rgba(246,243,232,0.25);
+  }
+  .breath-circle{
+    width:96px;height:96px;
+    border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, #F3D9A6, var(--gold) 70%);
+    box-shadow:0 0 40px rgba(201,138,62,0.55);
+    animation:breathe 14s ease-in-out infinite;
+  }
+  @keyframes breathe{
+    0%   {transform:scale(0.72);}
+    28%  {transform:scale(1.12);}
+    57%  {transform:scale(1.12);}
+    100% {transform:scale(0.72);}
+  }
+  .breath-label{
+    position:absolute;
+    bottom:-34px;
+    font-size:14px;
+    letter-spacing:.08em;
+    color:#F6F3E8;
+    font-weight:600;
+  }
+
+  .cta{
+    display:inline-block;
+    background:var(--gold);
+    color:#26200F;
+    font-weight:700;
+    font-family:"Zen Maru Gothic",sans-serif;
+    padding:14px 34px;
+    border-radius:999px;
+    text-decoration:none;
+    border:none;
+    font-size:16px;
+    cursor:pointer;
+    box-shadow:0 8px 20px rgba(0,0,0,0.18);
+  }
+
+  /* ---------- SECTIONS ---------- */
+  section{padding:44px 24px 0;}
+  .section-head{margin-bottom:22px;}
+  .kicker{
+    display:inline-block;
+    font-size:12px;
+    font-weight:700;
+    letter-spacing:.1em;
+    color:var(--pine);
+    background:rgba(53,86,76,0.08);
+    padding:4px 12px;
+    border-radius:999px;
+    margin-bottom:10px;
+  }
+  h2{font-size:22px;margin:0 0 8px;color:var(--pine-deep);}
+  .lead{color:var(--ink-soft);font-size:14.5px;margin:0;}
+
+  .card{
+    background:var(--surface);
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+    border:1px solid var(--line);
+  }
+
+  /* intro */
+  .intro-card{padding:22px 24px;margin-top:4px;}
+  .intro-card p{margin:0 0 10px;font-size:14.5px;color:var(--ink-soft);}
+  .intro-card p:last-child{margin-bottom:0;}
+
+  /* checklist */
+  .progress-track{
+    height:6px;background:var(--line);border-radius:999px;overflow:hidden;margin:18px 0 26px;
+  }
+  .progress-fill{
+    height:100%;width:0%;background:linear-gradient(90deg,var(--gold),var(--pine));
+    transition:width .3s ease;
+  }
+  .q-list{display:flex;flex-direction:column;gap:12px;}
+  .q-card{padding:18px 20px;}
+  .q-num{font-size:12px;color:var(--gold);font-weight:700;letter-spacing:.06em;margin-bottom:6px;}
+  .q-text{font-size:15px;margin:0 0 14px;font-weight:500;}
+  .opt-row{display:flex;gap:8px;flex-wrap:wrap;}
+  .opt{
+    flex:1 1 auto;
+    min-width:84px;
+    text-align:center;
+    padding:10px 8px;
+    border-radius:12px;
+    border:1.5px solid var(--line);
+    background:#fff;
+    font-size:13.5px;
+    font-weight:600;
+    color:var(--ink-soft);
+    cursor:pointer;
+    transition:all .15s ease;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .opt:hover{border-color:var(--pine);}
+  .opt.selected{
+    background:var(--pine);
+    border-color:var(--pine);
+    color:#fff;
+  }
+  .q-card.crisis-q{border:1.5px solid var(--gold-soft);background:#FFFDF7;}
+  .q-card.crisis-q .q-text{font-weight:600;}
+
+  .crisis-alert{
+    display:none;
+    margin-top:10px;
+    padding:18px 20px;
+    border-radius:16px;
+    background:#FBF1EC;
+    border:1.5px solid var(--brick);
+  }
+  .crisis-alert.show{display:block;}
+  .crisis-alert p{margin:0 0 12px;font-size:14px;color:#5C2E23;}
+  .crisis-alert .phone-list{display:flex;flex-direction:column;gap:8px;}
+  .phone-btn{
+    display:flex;justify-content:space-between;align-items:center;
+    background:#fff;border:1px solid #E3C3B9;border-radius:12px;
+    padding:12px 14px;text-decoration:none;color:var(--ink);font-size:14px;font-weight:600;
+  }
+  .phone-btn span.num{color:var(--brick);font-family:"Zen Maru Gothic",sans-serif;font-size:15px;}
+
+  .reveal-wrap{text-align:center;margin:30px 0 6px;}
+  .reveal-btn{
+    background:var(--pine);color:#fff;font-family:"Zen Maru Gothic",sans-serif;
+    font-weight:700;border:none;padding:14px 30px;border-radius:999px;
+    font-size:15px;cursor:pointer;box-shadow:var(--shadow);
+    opacity:.4;pointer-events:none;transition:opacity .3s ease;
+  }
+  .reveal-btn.ready{opacity:1;pointer-events:auto;}
+  .reveal-hint{font-size:12.5px;color:var(--ink-soft);margin-top:10px;}
+
+  /* result */
+  #result-section{display:none;}
+  .result-card{padding:26px 24px;text-align:center;}
+  .result-tier{
+    font-family:"Zen Maru Gothic",sans-serif;
+    font-size:20px;font-weight:700;margin:10px 0 12px;
+  }
+  .result-desc{font-size:14.5px;color:var(--ink-soft);margin:0 0 18px;max-width:46ch;margin-left:auto;margin-right:auto;}
+  .result-tag{
+    display:inline-block;padding:6px 16px;border-radius:999px;font-size:12.5px;font-weight:700;letter-spacing:.05em;
+  }
+
+  /* self-care grid */
+  .care-grid{display:grid;grid-template-columns:1fr;gap:12px;margin-top:4px;}
+  @media(min-width:560px){.care-grid{grid-template-columns:1fr 1fr;}}
+  .care-card{padding:18px 18px;}
+  .care-card .care-icon{font-size:22px;margin-bottom:8px;display:block;}
+  .care-card h3{font-size:15px;margin:0 0 6px;color:var(--pine-deep);}
+  .care-card p{font-size:13.5px;color:var(--ink-soft);margin:0;}
+
+  /* contacts */
+  .contact-card{
+    padding:22px 22px 8px;
+    background:var(--dusk-deep);
+    color:#EFF1EA;
+    border-radius:var(--radius);
+  }
+  .contact-card h2{color:#fff;}
+  .contact-card .lead{color:#C6CBDA;}
+  .contact-item{
+    border-top:1px solid rgba(255,255,255,0.14);
+    padding:16px 0;
+  }
+  .contact-item .c-name{font-weight:700;font-size:14.5px;margin-bottom:4px;}
+  .contact-item .c-meta{font-size:12.5px;color:#B9C0D2;margin-bottom:10px;}
+  .contact-tel{
+    display:inline-flex;align-items:center;gap:8px;
+    background:var(--gold);color:#26200F;font-family:"Zen Maru Gothic",sans-serif;
+    font-weight:700;padding:10px 18px;border-radius:999px;text-decoration:none;font-size:14.5px;
+  }
+  .emergency-box{
+    margin:18px 0 20px;padding:16px 18px;border-radius:14px;
+    background:#5C2E23;border:1px solid var(--brick);
+  }
+  .emergency-box .c-name{color:#FBEAE4;}
+  .emergency-box .contact-tel{background:#F6F3E8;}
+
+  footer{padding:44px 24px 0;}
+  .disclaimer{
+    font-size:12px;color:var(--ink-soft);line-height:1.9;
+    border-top:1px solid var(--line);padding-top:20px;
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="eyebrow">こころのチェック</div>
+    <h1>いま、心はどんな様子ですか</h1>
+    <p>大きな自然災害のあと、心や体に変化が起きるのは、誰にでも起こる自然な反応です。まずは深呼吸から、少しだけ自分の心に目を向けてみましょう。</p>
+
+    <div class="breath-wrap">
+      <div class="breath-ring"></div>
+      <div class="breath-circle"></div>
+      <div class="breath-label" id="breathLabel">吸って…</div>
+    </div>
+
+    <a href="#checklist" class="cta">チェックをはじめる</a>
+  </div>
+
+  <!-- INTRO -->
+  <section>
+    <div class="card intro-card">
+      <p><strong>これは診断ではありません。</strong>今のあなたの心の状態を、自分自身で振り返るための簡単な問いかけです。結果は良し悪しを判定するものではなく、次にできることを一緒に考えるためのものです。</p>
+      <p>回答はこの画面にのみ表示され、送信・保存はされません。閉じると記録は消えます。安心して、正直な今の気持ちで答えてください。</p>
+    </div>
+  </section>
+
+  <!-- CHECKLIST -->
+  <section id="checklist">
+    <div class="section-head">
+      <span class="kicker">STEP 1</span>
+      <h2>この1週間をふりかえる</h2>
+      <p class="lead">それぞれ、あてはまるものを選んでください。全13問です。</p>
+    </div>
+
+    <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+
+    <div class="q-list" id="qList"></div>
+
+    <div class="reveal-wrap">
+      <button class="reveal-btn" id="revealBtn">結果を見る</button>
+      <p class="reveal-hint" id="revealHint">あと13問</p>
+    </div>
+  </section>
+
+  <!-- RESULT -->
+  <section id="result-section">
+    <div class="section-head">
+      <span class="kicker">STEP 2</span>
+      <h2>いまの心の状態</h2>
+    </div>
+    <div class="card result-card" id="resultCard">
+      <span class="result-tag" id="resultTag"></span>
+      <div class="result-tier" id="resultTier"></div>
+      <p class="result-desc" id="resultDesc"></p>
+    </div>
+  </section>
+
+  <!-- SELF CARE -->
+  <section>
+    <div class="section-head">
+      <span class="kicker">STEP 3</span>
+      <h2>今日からできる、こころのケア</h2>
+      <p class="lead">スコアに関わらず、どれも無理のない範囲で試してみてください。</p>
+    </div>
+    <div class="care-grid">
+      <div class="card care-card">
+        <span class="care-icon">🌬️</span>
+        <h3>呼吸をととのえる</h3>
+        <p>上の光の玉に合わせて、1〜2分だけゆっくり呼吸してみましょう。吸う・止める・吐くを繰り返すだけで、体の緊張がゆるみます。</p>
+      </div>
+      <div class="card care-card">
+        <span class="care-icon">⏰</span>
+        <h3>生活のリズムを保つ</h3>
+        <p>避難先など環境が変わっていても、起きる時間・食べる時間をできるだけ一定にすると、心も落ち着きやすくなります。</p>
+      </div>
+      <div class="card care-card">
+        <span class="care-icon">🤝</span>
+        <h3>誰かと少しつながる</h3>
+        <p>無理に話さなくて大丈夫。そばに誰かがいる、声をかけ合う、それだけでも心の支えになります。</p>
+      </div>
+      <div class="card care-card">
+        <span class="care-icon">📵</span>
+        <h3>情報から少し離れる</h3>
+        <p>災害関連のニュースやSNSを見続けると、不安が強くなることがあります。見る時間を意識して区切ってみましょう。</p>
+      </div>
+      <div class="card care-card">
+        <span class="care-icon">🚶</span>
+        <h3>体を少し動かす</h3>
+        <p>軽くストレッチする、その場で足踏みするなど、できる範囲で体を動かすと気分が変わることがあります。</p>
+      </div>
+      <div class="card care-card">
+        <span class="care-icon">📝</span>
+        <h3>気持ちを書き出す</h3>
+        <p>頭に浮かぶ言葉をメモに書き出してみましょう。誰かに見せる必要はありません。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACTS -->
+  <section>
+    <div class="section-head">
+      <span class="kicker">STEP 4</span>
+      <h2>一人で抱えなくて大丈夫</h2>
+      <p class="lead">つらさが続くとき、話を聞いてほしいとき、いつでも頼ってください。</p>
+    </div>
+
+    <div class="contact-card">
+      <div class="emergency-box">
+        <div class="c-name">命に関わる危険がある場合</div>
+        <div class="c-meta">今すぐ、ためらわずに</div>
+        <a href="tel:119" class="contact-tel">📞 119（救急）</a>
+      </div>
+
+      <div class="contact-item">
+        <div class="c-name">よりそいホットライン</div>
+        <div class="c-meta">24時間対応・通話無料／被災者専用の案内あり（岩手・宮城・福島は 0120-279-226）</div>
+        <a href="tel:0120279338" class="contact-tel"><span class="num">0120-279-338</span></a>
+      </div>
+
+      <div class="contact-item">
+        <div class="c-name">こころの健康相談統一ダイヤル</div>
+        <div class="c-meta">お住まいの都道府県の相談窓口につながります</div>
+        <a href="tel:0570064556" class="contact-tel"><span class="num">0570-064-556</span></a>
+      </div>
+
+      <div class="contact-item">
+        <div class="c-name">いのちの電話</div>
+        <div class="c-meta">フリーダイヤル：毎日16:00〜21:00／毎月10日 8:00〜翌11日8:00（無料）</div>
+        <a href="tel:0120783556" class="contact-tel"><span class="num">0120-783-556</span></a>
+        <div class="c-meta" style="margin-top:10px;">ナビダイヤル：毎日10:00〜22:00（通話料がかかります）</div>
+        <a href="tel:0570783556" class="contact-tel"><span class="num">0570-783-556</span></a>
+      </div>
+
+      <div class="contact-item" style="border-bottom:1px solid rgba(255,255,255,0.14);">
+        <div class="c-name">子どもの人権110番</div>
+        <div class="c-meta">18歳以下の方、子どものことで悩む大人の方も（平日8:30〜17:15）</div>
+        <a href="tel:0120007110" class="contact-tel"><span class="num">0120-007-110</span></a>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <p class="disclaimer">
+      このツールは医学的な診断を行うものではありません。ご自身の心の状態を振り返るための参考としてご利用ください。回答内容はこの端末の画面にのみ一時的に表示され、どこにも送信・保存されません。強いつらさが続く場合や、心配な症状がある場合は、上記の相談窓口や、お近くの医療機関・保健センターにご相談ください。
+    </p>
+  </footer>
+
+</div>
+
+<script>
+// ---------- breathing label sync ----------
+(function(){
+  const label = document.getElementById('breathLabel');
+  const phases = [
+    {text:'吸って…', dur:4000},
+    {text:'止めて…', dur:4000},
+    {text:'吐いて…', dur:6000},
+  ];
+  let i = 0;
+  function next(){
+    label.textContent = phases[i].text;
+    setTimeout(()=>{ i = (i+1) % phases.length; next(); }, phases[i].dur);
+  }
+  next();
+})();
+
+// ---------- questions ----------
+const QUESTIONS = [
+  "夜、なかなか眠れない、何度も目が覚める",
+  "災害のことを考えたくないのに、ふと思い出してしまう",
+  "物音や揺れに、以前より敏感になった",
+  "食欲がない、または食べ過ぎてしまう",
+  "気持ちが落ち着かず、そわそわする",
+  "ちょっとしたことでイライラしたり、涙が出たりする",
+  "体がだるい、頭が痛い、お腹の調子が悪いなど、体調に変化がある",
+  "一人になるのが怖い、誰かと一緒にいたいと感じる",
+  "これから先のことを考えると、不安でいっぱいになる",
+  "物事に集中できない、ぼんやりしてしまう",
+  "誰とも話したくない、人と会うのが億劫だ",
+  "楽しいと感じることが少なくなった",
+];
+const CRISIS_Q = "消えてしまいたい、生きているのがつらいと感じることがある";
+const OPTIONS = [{label:"ない",v:0},{label:"ときどき",v:1},{label:"よくある",v:2}];
+
+const qList = document.getElementById('qList');
+const answers = new Array(QUESTIONS.length).fill(null);
+let crisisAnswer = null;
+
+QUESTIONS.forEach((text, idx)=>{
+  const card = document.createElement('div');
+  card.className = 'card q-card';
+  card.innerHTML = `
+    <div class="q-num">Q${idx+1} / ${QUESTIONS.length + 1}</div>
+    <p class="q-text">${text}</p>
+    <div class="opt-row" data-idx="${idx}">
+      ${OPTIONS.map(o=>`<div class="opt" data-v="${o.v}">${o.label}</div>`).join('')}
+    </div>
+  `;
+  qList.appendChild(card);
+});
+
+// crisis question card (separate styling, not summed into score)
+const crisisCard = document.createElement('div');
+crisisCard.className = 'card q-card crisis-q';
+crisisCard.innerHTML = `
+  <div class="q-num">Q${QUESTIONS.length+1} / ${QUESTIONS.length + 1}</div>
+  <p class="q-text">${CRISIS_Q}</p>
+  <div class="opt-row" data-idx="crisis">
+    ${OPTIONS.map(o=>`<div class="opt" data-v="${o.v}">${o.label}</div>`).join('')}
+  </div>
+  <div class="crisis-alert" id="crisisAlert">
+    <p>そう感じているあなたを、どうか責めないでください。今のつらさを、一人で抱えなくていいのです。よろしければ、下の窓口に電話してみてください。ここに書いた気持ちはこの画面にだけあり、他の誰にも送信されません。</p>
+    <div class="phone-list">
+      <a href="tel:0120279338" class="phone-btn"><span>よりそいホットライン（24時間）</span><span class="num">0120-279-338</span></a>
+      <a href="tel:0570064556" class="phone-btn"><span>こころの健康相談統一ダイヤル</span><span class="num">0570-064-556</span></a>
+      <a href="tel:119" class="phone-btn"><span>今すぐ危険を感じるとき</span><span class="num">119</span></a>
+    </div>
+  </div>
+`;
+qList.appendChild(crisisCard);
+
+// click handling
+qList.addEventListener('click', (e)=>{
+  const opt = e.target.closest('.opt');
+  if(!opt) return;
+  const row = opt.parentElement;
+  const idx = row.getAttribute('data-idx');
+  const v = parseInt(opt.getAttribute('data-v'),10);
+
+  [...row.children].forEach(c=>c.classList.remove('selected'));
+  opt.classList.add('selected');
+
+  if(idx === 'crisis'){
+    crisisAnswer = v;
+    const alertBox = document.getElementById('crisisAlert');
+    if(v >= 1){ alertBox.classList.add('show'); }
+    else { alertBox.classList.remove('show'); }
+  } else {
+    answers[parseInt(idx,10)] = v;
+  }
+  updateProgress();
+});
+
+function updateProgress(){
+  const answeredCount = answers.filter(a=>a!==null).length + (crisisAnswer!==null?1:0);
+  const total = QUESTIONS.length + 1;
+  const pct = Math.round((answeredCount/total)*100);
+  document.getElementById('progressFill').style.width = pct + '%';
+
+  const btn = document.getElementById('revealBtn');
+  const hint = document.getElementById('revealHint');
+  if(answeredCount === total){
+    btn.classList.add('ready');
+    hint.textContent = '準備ができました';
+  } else {
+    btn.classList.remove('ready');
+    hint.textContent = `あと${total - answeredCount}問`;
+  }
+}
+
+document.getElementById('revealBtn').addEventListener('click', ()=>{
+  if(!document.getElementById('revealBtn').classList.contains('ready')) return;
+  const score = answers.reduce((a,b)=>a+b,0);
+
+  let tier, tag, tagColor, desc;
+  if(score <= 6){
+    tier = "今は比較的落ち着いています";
+    tag = "穏やか";
+    tagColor = {bg:'rgba(53,86,76,0.12)', color:'var(--pine-deep)'};
+    desc = "大きな変化は少ないようですが、余震や生活の変化で今後気持ちが揺れることもあります。無理せず、セルフケアを続けてみてください。";
+  } else if(score <= 14){
+    tier = "心が疲れているサインが出ています";
+    tag = "ケアのサイン";
+    tagColor = {bg:'rgba(201,138,62,0.16)', color:'#8A5A21'};
+    desc = "眠りや気持ちの面で、負担がかかっているようです。これは弱さではなく、大きな出来事を経験した後の自然な反応です。下のセルフケアを試しながら、身近な人にも今の気持ちを話してみてください。";
+  } else {
+    tier = "心が大きな負担を抱えています";
+    tag = "サポートが必要かもしれません";
+    tagColor = {bg:'rgba(168,88,71,0.14)', color:'#7A3A2C'};
+    desc = "今、心にとても大きな負担がかかっているようです。一人で抱え込まず、下の相談窓口や、お近くの医療機関・保健センターに早めに連絡することをおすすめします。あなたのつらさは、誰かに話していいものです。";
+  }
+
+  document.getElementById('resultTier').textContent = tier;
+  document.getElementById('resultDesc').textContent = desc;
+  const tagEl = document.getElementById('resultTag');
+  tagEl.textContent = tag;
+  tagEl.style.background = tagColor.bg;
+  tagEl.style.color = tagColor.color;
+
+  const resultSection = document.getElementById('result-section');
+  resultSection.style.display = 'block';
+  resultSection.scrollIntoView({behavior:'smooth', block:'start'});
+});
+</script>
+</body>
+</html>
